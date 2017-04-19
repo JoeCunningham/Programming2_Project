@@ -131,6 +131,8 @@ public class Window extends JFrame {
 		}
 	}
 	
+	//validate url then call loadpage method on browser class
+	
 	public void addToHistory(String url) {
 		int size = history.size();
 		boolean exists = false;

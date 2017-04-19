@@ -21,7 +21,7 @@ public class HistoryWindow extends JFrame {
 			historyArray[i] = history.get(i);
 		}
 		
-		JList historyList = new JList(historyArray);
+		JList<String> historyList = new JList<String>(historyArray);
 		historyList.setLayoutOrientation(JList.VERTICAL);
 		historyList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scroller = new JScrollPane(historyList);
