@@ -24,8 +24,10 @@ public class Window extends JFrame {
 
 		history.add(homeURL);
 
+		
+		MenuBar menuBar = new MenuBar(this);
 
-		MenuBar menuBar = new MenuBar();
+		//MenuBar menuBar = new MenuBar();
 		this.setJMenuBar(menuBar);
 
 		btnBack = new JButton("<");

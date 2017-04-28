@@ -7,7 +7,7 @@ import javax.swing.JMenuItem;
 
 public class MenuBar extends JMenuBar {
 	
-	public MenuBar() {
+	public MenuBar(Window w) {
 
 		JMenu file = new JMenu("File");
 		JMenuItem newWindow = new JMenuItem("New Window");
