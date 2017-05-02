@@ -7,7 +7,11 @@ import javax.swing.JMenuItem;
 
 public class MenuBar extends JMenuBar {
 	
-	public MenuBar() {
+	private Window w;
+	
+	public MenuBar(Window x) {
+		
+		this.w = x;
 
 		JMenu file = new JMenu("File");
 		JMenuItem newWindow = new JMenuItem("New Window");
@@ -44,6 +48,18 @@ public class MenuBar extends JMenuBar {
 		
 		
 		JMenu history = new JMenu("History");
+		JMenuItem clearHistory = new JMenuItem("Clear History");
+		history.add(clearHistory);
+		
+		clearHistory.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						w.clearHistory();
+					}
+				}
+				);
+
+		
 		
 		JMenu navigation = new JMenu("Navigation");
 		JMenuItem back = new JMenuItem("Back");

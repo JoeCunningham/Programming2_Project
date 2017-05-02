@@ -1,7 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -15,24 +17,31 @@ public class Window extends JFrame {
 	private ArrayList<String> history;
 	private static int currentPageIndex;
 	private static int originalPageIndex;
+	private String homeURL;
+	
+	private BufferedWriter bw = null;
+	private File file = null;
+	private static final String FILENAME = "/Users/joe/Desktop/history.txt";
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy - hh:mm");
+
 	
 	public Window() {
 		history = new ArrayList<String>();
 
-		this.setTitle("Glenn is gay");
-		String homeURL = "http://www.java.com/";
+		this.setTitle("browser");
+		setHomeURL("http://www.java.com/"); // TODO: Read in from file
 
-		history.add(homeURL);
+		history.add(getHomeURL());
 
 
-		MenuBar menuBar = new MenuBar();
+		MenuBar menuBar = new MenuBar(this); // TODO: pass 'this' as parameter
 		this.setJMenuBar(menuBar);
 
 		btnBack = new JButton("<");
 		btnForward = new JButton(">");
 		btnHome = new JButton("Home");
 		btnRefresh = new JButton("Refresh");
-		addressBar = new JTextField(homeURL, 30);
+		addressBar = new JTextField(getHomeURL(), 30);
 		btnGo = new JButton("GO");
 
 		btnForward.setEnabled(false);
@@ -47,20 +56,8 @@ public class Window extends JFrame {
 		panel.add(btnGo);
 
 
-		html = new Browser(homeURL);
+		html = new Browser(this);
 		
-		html.setEditable(false);
-
-		html.addHyperlinkListener(
-				new HyperlinkListener() {
-					public void hyperlinkUpdate(HyperlinkEvent click) {
-						if (click.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
-							loadURL(click.getURL().toString());
-						}
-					}
-				}
-				);
-
 
 		btnGo.addActionListener(
 				new ActionListener() {
@@ -90,7 +87,7 @@ public class Window extends JFrame {
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						//HistoryWindow h = new HistoryWindow(history);
-						writeHistory();
+						//writeHistory();
 					}
 				}
 				);
@@ -117,7 +114,7 @@ public class Window extends JFrame {
 	
 	public void loadURL(String url) {
 		html.loadURL(url);
-		addressBar.setText(url);
+		//addressBar.setText(url);
 		addToHistory(url);
 	}
 	
@@ -131,7 +128,7 @@ public class Window extends JFrame {
 		}
 	}
 	
-	//validate url then call loadpage method on browser class
+	//TODO: validate url then call loadpage method on browser class
 	
 	public void addToHistory(String url) {
 		int size = history.size();
@@ -155,7 +152,43 @@ public class Window extends JFrame {
 		System.out.println("clear");
 	}
 	
-	public void writeHistory() {
+	public void printHistory(String url) {
+		try {
+			Date d = new Date();
+			String data = DATE_FORMAT.format(d) + " " + url + System.lineSeparator();
+
+			file = new File(FILENAME);
+
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			//fw = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+
+			bw.write(data);
+
+			System.out.println("Done");
+			
+			bw.close();
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void clearHistory() {
+		file.delete();
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	  public void writeHistory() {
 		//PrintWriter f = null;
 		try {
 			PrintWriter f = new PrintWriter("src/history.txt");
@@ -165,12 +198,21 @@ public class Window extends JFrame {
 		}
 		
 		
-		/*
+		
 		for(int i = 0; i < history.size(); i++) {
 			f.println(history.get(i));
-		} */
+		} 
 		
 		
+	} */
+
+	public String getHomeURL() {
+		return homeURL;
 	}
+
+	public void setHomeURL(String homeURL) {
+		this.homeURL = homeURL;
+	}
+	
 
 }
