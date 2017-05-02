@@ -30,7 +30,6 @@ public class Window extends JFrame {
 	private static final String FAVOURITES_FILENAME = "/Users/joe/Desktop/favourites.txt";
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy   hh:mm");
 
-	
 	public Window() {
 		
 		//history = new ArrayList<String>();
