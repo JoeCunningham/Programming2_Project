@@ -8,10 +8,12 @@ import javax.swing.JMenuItem;
 public class MenuBar extends JMenuBar {
 	
 	private Window w;
+	private Browser b;
 	
-	public MenuBar(Window x) {
+	public MenuBar(Window x, Browser z) {
 		
 		this.w = x;
+		this.b = z;
 
 		JMenu file = new JMenu("File");
 		JMenuItem newWindow = new JMenuItem("New Window");
@@ -26,6 +28,7 @@ public class MenuBar extends JMenuBar {
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						//NEW WINDOW
+						//TODO
 					}
 				}
 				);
@@ -34,6 +37,7 @@ public class MenuBar extends JMenuBar {
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						//PRINT PAGE
+						//TODO
 					}
 				}
 				);
@@ -42,6 +46,7 @@ public class MenuBar extends JMenuBar {
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						//SAVE PAGE
+						//TODO
 					}
 				}
 				);
@@ -66,15 +71,18 @@ public class MenuBar extends JMenuBar {
 		JMenuItem forward = new JMenuItem("Forward");
 		JMenuItem home = new JMenuItem("Home");
 		JMenuItem refresh = new JMenuItem("Refresh");
+		JMenuItem setHome = new JMenuItem("Set current site to home");
 		navigation.add(back);
 		navigation.add(forward);
 		navigation.add(home);
 		navigation.add(refresh);
+		navigation.addSeparator();
+		navigation.add(setHome);
 		
 		back.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						//GO BACK
+						w.backPage();
 					}
 				}
 				);
@@ -82,7 +90,7 @@ public class MenuBar extends JMenuBar {
 		forward.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						//GO FORWARD
+						w.forwardPage();
 					}
 				}
 				);
@@ -90,7 +98,7 @@ public class MenuBar extends JMenuBar {
 		home.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						//GO TO HOME
+						w.loadHomePage();
 					}
 				}
 				);
@@ -98,19 +106,32 @@ public class MenuBar extends JMenuBar {
 		refresh.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						//REFRESH PAGE
+						b.refreshPage();
+					}
+				}
+				);
+		
+		setHome.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						w.setHomeURL(w.getAddressBar().getText());
 					}
 				}
 				);
 		
 
 		JMenu favourites = new JMenu("Favourites");
+		for(int i = 0; i < 11; i++) { //TODO: limit to 10 favorites
+			JMenuItem temp = new JMenuItem(Integer.toString(i));
+			favourites.add(temp); //TODO: read all favorites in and add to menubar
+		}
+		favourites.addSeparator();
 		JMenuItem addToFavourites = new JMenuItem("Add current site to favourites");
 		JMenuItem clearFavourites = new JMenuItem("Clear favourites");
 		favourites.add(addToFavourites);
-		favourites.add(clearFavourites);
+		favourites.add(clearFavourites);//TODO:??? favourites identified by name? requires popup window
 		
-		addToFavourites.addActionListener(
+		addToFavourites.addActionListener( //TODO: refresh favorites list when added
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						Window.addToFavourites();

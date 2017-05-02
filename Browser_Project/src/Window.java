@@ -11,31 +11,38 @@ import javax.swing.event.*;
 public class Window extends JFrame {	
 
 	private Browser html;
-	public JTextField addressBar;
+	private JTextField addressBar;
 	private JButton btnGo, btnBack, btnForward, btnHome, btnRefresh;
 	private final Dimension MINIMUM_SIZE = new Dimension(800, 600);
-	private ArrayList<String> history;
-	private static int currentPageIndex;
-	private static int originalPageIndex;
+	//private ArrayList<String> history;
+	//private static int currentPageIndex;
+	//private static int originalPageIndex;
 	private String homeURL;
+	private ArrayList<String> favourites;
 	
 	private BufferedWriter bw = null;
-	private File file = null;
-	private static final String FILENAME = "/Users/joe/Desktop/history.txt";
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy - hh:mm");
+	private BufferedReader br = null;
+	private File historyFile;
+	private File homepageFile;
+	private File favouritesFile;
+	private static final String HISTORY_FILENAME = "/Users/joe/Desktop/history.txt";
+	private static final String HOMEPAGE_FILENAME = "/Users/joe/Desktop/homepage.txt";
+	private static final String FAVOURITES_FILENAME = "/Users/joe/Desktop/favourites.txt";
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy   hh:mm");
 
 	
 	public Window() {
-		history = new ArrayList<String>();
+		
+		//history = new ArrayList<String>();
+		
+		historyFile = new File(HISTORY_FILENAME);
+		homepageFile = new File(HOMEPAGE_FILENAME);
+		favouritesFile = new File(FAVOURITES_FILENAME);
+
 
 		this.setTitle("browser");
-		setHomeURL("http://www.java.com/"); // TODO: Read in from file
-
-		history.add(getHomeURL());
-
-
-		MenuBar menuBar = new MenuBar(this); // TODO: pass 'this' as parameter
-		this.setJMenuBar(menuBar);
+		
+		writeHistory(getHomeURL());
 
 		btnBack = new JButton("<");
 		btnForward = new JButton(">");
@@ -53,16 +60,12 @@ public class Window extends JFrame {
 		panel.add(btnHome);
 		panel.add(btnRefresh);
 		panel.add(addressBar);
-		panel.add(btnGo);
-
-
-		html = new Browser(this);
-		
+		panel.add(btnGo);		
 
 		btnGo.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						loadURL(addressBar.getText());
+						html.loadURL(addressBar.getText());
 					}
 				}
 				);
@@ -78,7 +81,7 @@ public class Window extends JFrame {
 		addressBar.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent enter) {
-						loadURL(addressBar.getText());
+						html.loadURL(addressBar.getText());
 					}
 				}	
 				);     
@@ -88,6 +91,7 @@ public class Window extends JFrame {
 					public void actionPerformed(ActionEvent click) {
 						//HistoryWindow h = new HistoryWindow(history);
 						//writeHistory();
+						loadHomePage();
 					}
 				}
 				);
@@ -99,6 +103,11 @@ public class Window extends JFrame {
 					}
 				}
 				);
+		
+		html = new Browser(this);
+
+		MenuBar menuBar = new MenuBar(this, html); 
+		this.setJMenuBar(menuBar);
 
 		JScrollPane sp = new JScrollPane(html);
 		//    frame.setLayout(new BorderLayout());
@@ -111,15 +120,9 @@ public class Window extends JFrame {
 		this.setVisible(true);
 
 	}
-	
-	public void loadURL(String url) {
-		html.loadURL(url);
-		//addressBar.setText(url);
-		addToHistory(url);
-	}
-	
+		
 	public void backPage() {
-		loadURL(history.get(history.size()-2));
+		//loadURL(history.get(history.size()-2));
 	}
 	
 	public void forwardPage() {
@@ -130,7 +133,9 @@ public class Window extends JFrame {
 	
 	//TODO: validate url then call loadpage method on browser class
 	
-	public void addToHistory(String url) {
+	
+	//TODO implement linked list
+	/*public void addToHistory(String url) {
 		int size = history.size();
 		boolean exists = false;
 		for (int i = 0; i < size; i++) {
@@ -142,33 +147,29 @@ public class Window extends JFrame {
 			history.add(url);
 		}
 
-	}
+	} */
 	
 	public static void addToFavourites() {
-		System.out.println("add");
+		System.out.println("add"); //TODO
 	}
 	
 	public static void clearFavourites() {
-		System.out.println("clear");
+		System.out.println("clear"); //TODO
 	}
 	
-	public void printHistory(String url) {
+	public void writeHistory(String url) {
 		try {
 			Date d = new Date();
-			String data = DATE_FORMAT.format(d) + " " + url + System.lineSeparator();
+			String data = DATE_FORMAT.format(d) + "\t" + url; //TODO: edit history window to show this from file
 
-			file = new File(FILENAME);
-
-			if (!file.exists()) {
-				file.createNewFile();
+			if (!historyFile.exists()) {
+				historyFile.createNewFile();
 			}
 
-			//fw = new FileWriter(file.getAbsoluteFile(), true);
-			bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+			bw = new BufferedWriter(new FileWriter(historyFile.getAbsoluteFile(), true));
 
 			bw.write(data);
-
-			System.out.println("Done");
+			bw.newLine();
 			
 			bw.close();
 			
@@ -179,9 +180,9 @@ public class Window extends JFrame {
 	}
 
 	public void clearHistory() {
-		file.delete();
+		historyFile.delete();
 		try {
-			file.createNewFile();
+			historyFile.createNewFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -205,14 +206,76 @@ public class Window extends JFrame {
 		
 		
 	} */
+	
+	public void loadHomePage() {
+		html.loadURL(getHomeURL());
+	}
+	
+	
+	//TODO TODO ask demonstrator about this
+	//public void refreshPage() { //This is so the method can be called from MenuBar class without Browser object
+	//	html.refreshPage();
+	//}
 
 	public String getHomeURL() {
+		if (homepageFile.exists()) {
+			try {
+				br = new BufferedReader(new FileReader(homepageFile.getAbsoluteFile()));
+				homeURL = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				homeURL = "http://java.com";
+			}
+		} else {
+			homeURL = "http://java.com";
+		}
+
 		return homeURL;
 	}
 
 	public void setHomeURL(String homeURL) {
 		this.homeURL = homeURL;
+		try {
+			if (!homepageFile.exists()) {
+				homepageFile.createNewFile();
+			}
+
+			bw = new BufferedWriter(new FileWriter(homepageFile.getAbsoluteFile(), false));
+
+			bw.write(homeURL);
+		
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
+	public ArrayList<String> getFavourites() {
+		favourites = new ArrayList<String>();
 
+		if (favouritesFile.exists()) {
+			try {
+				br = new BufferedReader(new FileReader(homepageFile.getAbsoluteFile()));
+				String temp;
+				while ((temp = br.readLine()) != null) {
+					favourites.add(temp);
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//FIXME
+		
+		
+		
+		return favourites;
+	}
+	
+	public JTextField getAddressBar() {
+		return addressBar;
+	}
+	
+	//TODO:???IO class which return reader/writer for correct file
 }

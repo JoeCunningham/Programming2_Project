@@ -1,3 +1,6 @@
+import java.awt.Cursor;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import javax.swing.JEditorPane;
@@ -13,6 +16,7 @@ public class Browser extends JEditorPane {
 	//}
 	
 	private Window w;
+	private JOptionPane error;
 
 	public Browser(Window x) {
 		this.w = x;
@@ -20,7 +24,17 @@ public class Browser extends JEditorPane {
 		loadURL(w.getHomeURL());
 		setEditable(false);
 		
-		addHyperlinkListener(
+		
+		//cited from http://stackoverflow.com/questions/4252204/how-can-i-tell-if-a-jeditorpane-textpane-document-or-page-has-finished-loading
+		this.addPropertyChangeListener("page", //For the cursor
+				new PropertyChangeListener() {
+					public void propertyChange(PropertyChangeEvent evt) {
+						setCursor(Cursor.getDefaultCursor());
+					}
+				}
+				);
+		
+		this.addHyperlinkListener(
 				new HyperlinkListener() {
 					public void hyperlinkUpdate(HyperlinkEvent click) {
 						if (click.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
@@ -34,19 +48,36 @@ public class Browser extends JEditorPane {
 	
 	
 	public void loadURL(String url) {
-		try {
-			this.setPage(url);
-
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(validateURL(url)) {
+			w.getAddressBar().setText(url);
+			w.writeHistory(url);
+		} else {
+			System.out.println("ERROR!!");
+			//error = new JOptionPane();
+			//JOptionPane.show
+			//TODO: ^^
 		}
-		w.addressBar.setText(url);
-		w.printHistory(url);
 		
 	}
 	
 	public void refreshPage() {
-		loadURL(w.addressBar.getText());
+		loadURL(w.getAddressBar().getText());
+	}
+	
+	public boolean validateURL(String url) {
+		if(url.startsWith("http://") || url.startsWith("https://")) {
+			try {
+				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				setPage(url);
+				return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return false;
+		}
+				
 	}
 	
 }
