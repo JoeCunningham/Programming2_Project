@@ -29,7 +29,7 @@ public class RightClickMenu extends JPopupMenu {
 		load.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						b.loadURL(w.getFavourites().get(index));
+						b.loadURL(w.getFavourites().get(index), false);
 					}
 				}
 				);

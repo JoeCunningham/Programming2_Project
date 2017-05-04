@@ -48,7 +48,7 @@ public class HistoryWindow extends JFrame {
 		        if (evt.getClickCount() == 2) {
 		           String selectedValue = historyList.getSelectedValue();
 		           String[] parts = selectedValue.split("\t");
-		           b.loadURL(parts[1]);
+		           b.loadURL(parts[1], false);
 		           refresh();
 		        }
 		    }

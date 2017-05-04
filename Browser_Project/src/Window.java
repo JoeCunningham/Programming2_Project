@@ -4,6 +4,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Stack;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -17,6 +18,9 @@ public class Window extends JFrame {
 	private String homeURL;
 	private ArrayList<String> favourites;
 	private ArrayList<String> history;
+	
+	private Stack<String> backwardsStack;
+	private Stack<String> forwardsStack;
 	
 	private BufferedWriter bw = null;
 	private BufferedReader br = null;
@@ -32,13 +36,13 @@ public class Window extends JFrame {
 	private static final int MAX_FAVOURITES = 15;
 
 	public Window() {
-		
-		//history = new ArrayList<String>();
-		
+				
 		historyFile = new File(HISTORY_FILENAME);
 		homepageFile = new File(HOMEPAGE_FILENAME);
 		favouritesFile = new File(FAVOURITES_FILENAME);
 
+		backwardsStack = new Stack<String>();
+		forwardsStack = new Stack<String>();
 
 		this.setTitle("browser");
 		
@@ -49,7 +53,7 @@ public class Window extends JFrame {
 		addressBar = new JTextField(getHomeURL(), 30);
 		btnGo = new JButton("GO");
 
-		btnForward.setEnabled(false);
+		//TODO btnForward.setEnabled(false);
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout());
@@ -63,7 +67,7 @@ public class Window extends JFrame {
 		btnGo.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						html.loadURL(addressBar.getText());
+						html.loadURL(addressBar.getText(), false);
 					}
 				}
 				);
@@ -79,7 +83,7 @@ public class Window extends JFrame {
 		addressBar.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent enter) {
-						html.loadURL(addressBar.getText());
+						html.loadURL(addressBar.getText(), false);
 					}
 				}	
 				);     
@@ -87,8 +91,6 @@ public class Window extends JFrame {
 		btnHome.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
-						//HistoryWindow h = new HistoryWindow(history);
-						//writeHistory();
 						loadHomePage();
 					}
 				}
@@ -101,6 +103,15 @@ public class Window extends JFrame {
 					}
 				}
 				);
+		
+		btnForward.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						forwardPage();
+					}
+				}
+				);
+
 		
 		html = new Browser(this);
 
@@ -120,13 +131,13 @@ public class Window extends JFrame {
 	}
 		
 	public void backPage() {
-		//loadURL(history.get(history.size()-2));
+		forwardsStack.push(backwardsStack.pop());
+		html.loadURL(backwardsStack.peek(), true);
 	}
 	
 	public void forwardPage() {
-		if (!btnForward.isEnabled()) {
-			btnForward.setEnabled(true);
-		}
+		backwardsStack.push(forwardsStack.peek());
+		html.loadURL(forwardsStack.pop(), true);
 	}
 	
 	//TODO backwards and forwards
@@ -249,7 +260,7 @@ public class Window extends JFrame {
 	} */
 	
 	public void loadHomePage() {
-		html.loadURL(getHomeURL());
+		html.loadURL(getHomeURL(), false);
 	}
 	
 	public String getHomeURL() {
@@ -335,6 +346,15 @@ public class Window extends JFrame {
 	public JTextField getAddressBar() {
 		return addressBar;
 	}
+	
+	public Stack<String> getBackwardsStack() {
+		return backwardsStack;
+	}
+	
+	public Stack<String> getForwardsStack() {
+		return forwardsStack;
+	}
+
 	
 	//TODO:???IO/FileSystem/FileAccess class which return reader/writer for correct file
 }

@@ -20,7 +20,7 @@ public class Browser extends JEditorPane {
 	public Browser(Window x) {
 		this.w = x;
 		
-		loadURL(w.getHomeURL());
+		loadURL(w.getHomeURL(), false);
 		setEditable(false);
 		
 		
@@ -38,7 +38,7 @@ public class Browser extends JEditorPane {
 				new HyperlinkListener() {
 					public void hyperlinkUpdate(HyperlinkEvent click) {
 						if (click.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
-							loadURL(click.getURL().toString());
+							loadURL(click.getURL().toString(), false);
 						}
 					}
 				}
@@ -47,10 +47,17 @@ public class Browser extends JEditorPane {
 	}
 	
 	
-	public void loadURL(String url) {
+	public void loadURL(String url, boolean fromStack) {
+	//public void loadURL(String url) {
+		if(!fromStack) {
+			w.getForwardsStack().clear();
+			w.getBackwardsStack().push(url);
+		}
 		if(validateURL(url)) {
 			w.getAddressBar().setText(url);
 			w.writeHistory(url);
+			System.out.println("back:"+w.getBackwardsStack().toString());
+			System.out.println("forw:"+w.getForwardsStack().toString());
 		} else {
 			JOptionPane.showMessageDialog(w, "Invalid URL! \n Must start with \"http://\" or \"https://\"", "Error!", JOptionPane.ERROR_MESSAGE);
 
@@ -60,7 +67,7 @@ public class Browser extends JEditorPane {
 	
 	public void refreshPage() {
 		this.getDocument().putProperty(Document.StreamDescriptionProperty, null);
-		loadURL(w.getAddressBar().getText());
+		loadURL(w.getAddressBar().getText(), true);
 	}
 	
 	public boolean validateURL(String url) {

@@ -153,7 +153,7 @@ public class MenuBar extends JMenuBar {
 			temp.addActionListener(
 					new ActionListener() {
 						public void actionPerformed(ActionEvent click) {
-							b.loadURL(w.getFavourites().get(index));
+							b.loadURL(w.getFavourites().get(index), false);
 						}
 					}
 					);			
