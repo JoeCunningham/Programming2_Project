@@ -28,9 +28,10 @@ public class Window extends JFrame {
 	private File homepageFile;
 	private File favouritesFile;
 	private File tempFile;
-	private static final String HISTORY_FILENAME = "/Users/joe/Desktop/history.txt";
-	private static final String HOMEPAGE_FILENAME = "/Users/joe/Desktop/homepage.txt";
-	private static final String FAVOURITES_FILENAME = "/Users/joe/Desktop/favourites.txt";
+	//private static final String HISTORY_FILENAME = "/Users/joe/Desktop/history.txt";
+	private static final String HISTORY_FILENAME = "history.txt";
+	private static final String HOMEPAGE_FILENAME = "homepage.txt";
+	private static final String FAVOURITES_FILENAME = "favourites.txt";
 	private static final String TEMP_FILENAME = "/Users/joe/Desktop/temp.txt";
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy   hh:mm");
 	private static final int MAX_FAVOURITES = 15;
@@ -49,7 +50,7 @@ public class Window extends JFrame {
 		btnBack = new JButton("<");
 		btnForward = new JButton(">");
 		btnHome = new JButton("Home");
-		btnRefresh = new JButton("Refresh");
+		btnRefresh = new JButton("Refresh");//TODO?? preferences window?
 		addressBar = new JTextField(getHomeURL(), 30);
 		btnGo = new JButton("GO");
 
