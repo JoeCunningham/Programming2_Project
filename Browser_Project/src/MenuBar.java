@@ -9,13 +9,17 @@ public class MenuBar extends JMenuBar {
 	
 	private Window w;
 	private Browser b;
+	private MenuBar mb;
+	private JMenu history, navigation, favourites;
+	private JMenuItem addToFavourites, showFavourites, clearFavourites;
 	
-	public MenuBar(Window x, Browser z) {
+	public MenuBar(Window window, Browser browser) {
 		
-		this.w = x;
-		this.b = z;
+		this.w = window;
+		this.b = browser;
+		mb = this;
 
-		JMenu file = new JMenu("File");
+	/*	JMenu file = new JMenu("File");
 		JMenuItem newWindow = new JMenuItem("New Window");
 		JMenuItem print = new JMenuItem("Print");
 		JMenuItem save = new JMenuItem("Save");
@@ -50,11 +54,22 @@ public class MenuBar extends JMenuBar {
 					}
 				}
 				);
+		*/
 		
-		
-		JMenu history = new JMenu("History");
-		JMenuItem clearHistory = new JMenuItem("Clear History");
+		history = new JMenu("History");
+		JMenuItem showHistory = new JMenuItem("Show history window");
+		JMenuItem clearHistory = new JMenuItem("Clear history");
+		history.add(showHistory);
 		history.add(clearHistory);
+		
+		showHistory.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						HistoryWindow hw = new HistoryWindow(b, w);
+					}
+				}
+				);
+
 		
 		clearHistory.addActionListener(
 				new ActionListener() {
@@ -65,8 +80,7 @@ public class MenuBar extends JMenuBar {
 				);
 
 		
-		
-		JMenu navigation = new JMenu("Navigation");
+		navigation = new JMenu("Navigation");
 		JMenuItem back = new JMenuItem("Back");
 		JMenuItem forward = new JMenuItem("Forward");
 		JMenuItem home = new JMenuItem("Home");
@@ -120,38 +134,57 @@ public class MenuBar extends JMenuBar {
 				);
 		
 
-		JMenu favourites = new JMenu("Favourites");
-		for(int i = 0; i < 11; i++) { //TODO: limit to 10 favorites
-			JMenuItem temp = new JMenuItem(Integer.toString(i));
-			favourites.add(temp); //TODO: read all favorites in and add to menubar
-		}
-		favourites.addSeparator();
-		JMenuItem addToFavourites = new JMenuItem("Add current site to favourites");
-		JMenuItem clearFavourites = new JMenuItem("Clear favourites");
-		favourites.add(addToFavourites);
-		favourites.add(clearFavourites);//TODO:??? favourites identified by name? requires popup window
-		
-		addToFavourites.addActionListener( //TODO: refresh favorites list when added
-				new ActionListener() {
-					public void actionPerformed(ActionEvent click) {
-						Window.addToFavourites();
-					}
-				}
-				);
-		
-		clearFavourites.addActionListener(
-				new ActionListener() {
-					public void actionPerformed(ActionEvent click) {
-						Window.clearFavourites();
-					}
-				}
-				);
+		favourites = new JMenu("Favourites");
+		populateFavouritesMenu();
 
-		this.add(file);
+//		this.add(file);
 		this.add(navigation);
 		this.add(history);
 		this.add(favourites);
 		
+	}
+	
+	public void populateFavouritesMenu() {
+		favourites.removeAll();
+		for(int i = 0; i < w.getFavourites().size() ; i++) {
+			JMenuItem temp = new JMenuItem(w.getFavourites().get(i));
+			favourites.add(temp); //TODO: refresh this list
+		}
+		favourites.addSeparator();
+		addToFavourites = new JMenuItem("Add current site to favourites");
+		showFavourites = new JMenuItem("Show favourites window");
+		clearFavourites = new JMenuItem("Clear favourites");
+		favourites.add(addToFavourites);
+		favourites.add(showFavourites);
+		favourites.add(clearFavourites);
+
+		addToFavourites.addActionListener( //TODO: refresh favorites list when added
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						w.addFavourite(b.getPage().toString());
+						populateFavouritesMenu();
+					}
+				}
+				);
+		
+		showFavourites.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						FavouritesWindow fw = new FavouritesWindow(w, b, mb);
+					}
+				}
+				);
+
+		
+		clearFavourites.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent click) {
+						w.clearFavourites();
+						populateFavouritesMenu();
+					}
+				}
+				);
+
 	}
 }
 

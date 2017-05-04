@@ -16,7 +16,6 @@ public class Browser extends JEditorPane {
 	//}
 	
 	private Window w;
-	private JOptionPane error;
 
 	public Browser(Window x) {
 		this.w = x;
@@ -30,6 +29,7 @@ public class Browser extends JEditorPane {
 				new PropertyChangeListener() {
 					public void propertyChange(PropertyChangeEvent evt) {
 						setCursor(Cursor.getDefaultCursor());
+						//w.getAddressBar().setText(getPage().toString());
 					}
 				}
 				);
@@ -52,15 +52,14 @@ public class Browser extends JEditorPane {
 			w.getAddressBar().setText(url);
 			w.writeHistory(url);
 		} else {
-			System.out.println("ERROR!!");
-			//error = new JOptionPane();
-			//JOptionPane.show
-			//TODO: ^^
+			JOptionPane.showMessageDialog(w, "Invalid URL! \n Must start with \"http://\" or \"https://\"", "Error!", JOptionPane.ERROR_MESSAGE);
+
 		}
 		
 	}
 	
 	public void refreshPage() {
+		this.getDocument().putProperty(Document.StreamDescriptionProperty, null);
 		loadURL(w.getAddressBar().getText());
 	}
 	

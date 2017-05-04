@@ -14,21 +14,24 @@ public class Window extends JFrame {
 	private JTextField addressBar;
 	private JButton btnGo, btnBack, btnForward, btnHome, btnRefresh;
 	private final Dimension MINIMUM_SIZE = new Dimension(800, 600);
-	//private ArrayList<String> history;
 	//private static int currentPageIndex;
 	//private static int originalPageIndex;
 	private String homeURL;
 	private ArrayList<String> favourites;
+	private ArrayList<String> history;
 	
 	private BufferedWriter bw = null;
 	private BufferedReader br = null;
 	private File historyFile;
 	private File homepageFile;
 	private File favouritesFile;
+	private File tempFile;
 	private static final String HISTORY_FILENAME = "/Users/joe/Desktop/history.txt";
 	private static final String HOMEPAGE_FILENAME = "/Users/joe/Desktop/homepage.txt";
 	private static final String FAVOURITES_FILENAME = "/Users/joe/Desktop/favourites.txt";
+	private static final String TEMP_FILENAME = "/Users/joe/Desktop/temp.txt";
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy   hh:mm");
+	private static final int MAX_FAVOURITES = 15;
 
 	public Window() {
 		
@@ -41,7 +44,7 @@ public class Window extends JFrame {
 
 		this.setTitle("browser");
 		
-		writeHistory(getHomeURL());
+		//getFavourites(); //TODO remove this, put in jmenubar class
 
 		btnBack = new JButton("<");
 		btnForward = new JButton(">");
@@ -148,12 +151,53 @@ public class Window extends JFrame {
 
 	} */
 	
-	public static void addToFavourites() {
-		System.out.println("add"); //TODO
+	public void addFavourite(String url) { //TODO favourites window
+		boolean exists = false; //TODO remove individual favourite
+		for (int i = 0; i < getFavourites().size(); i++) {
+			if (getFavourites().get(i).equals(url)) {
+				exists = true;
+			}
+		}
+		if (!exists) {
+			try {
+				if (getFavourites().size() < MAX_FAVOURITES) { //TODO check if it already exists
+					bw = new BufferedWriter(new FileWriter(favouritesFile.getAbsoluteFile(), true));
+					bw.write(url);
+					bw.newLine();
+					bw.close();
+				} else {
+					JOptionPane.showMessageDialog(this, "Too many favourites! \n Maximum: " + MAX_FAVOURITES, "Warning!", JOptionPane.WARNING_MESSAGE);
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Already in your favourites!", "Warning!", JOptionPane.WARNING_MESSAGE);
+		}
+		
 	}
 	
-	public static void clearFavourites() {
+	public void clearFavourites() {
 		System.out.println("clear"); //TODO
+	}
+	
+	public ArrayList<String> getHistory() {
+		history = new ArrayList<String>();
+		try {
+			if (historyFile.exists()) {
+				br = new BufferedReader(new FileReader(historyFile.getAbsoluteFile()));
+				String temp;
+				while ((temp = br.readLine()) != null) {
+					history.add(temp);
+				}
+			} else {
+				historyFile.createNewFile();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return history;
 	}
 	
 	public void writeHistory(String url) {
@@ -210,12 +254,6 @@ public class Window extends JFrame {
 		html.loadURL(getHomeURL());
 	}
 	
-	
-	//TODO TODO ask demonstrator about this
-	//public void refreshPage() { //This is so the method can be called from MenuBar class without Browser object
-	//	html.refreshPage();
-	//}
-
 	public String getHomeURL() {
 		if (homepageFile.exists()) {
 			try {
@@ -223,10 +261,9 @@ public class Window extends JFrame {
 				homeURL = br.readLine();
 			} catch (IOException e) {
 				e.printStackTrace();
-				homeURL = "http://java.com";
 			}
 		} else {
-			homeURL = "http://java.com";
+			setHomeURL("http://java.com");
 		}
 
 		return homeURL;
@@ -235,9 +272,9 @@ public class Window extends JFrame {
 	public void setHomeURL(String homeURL) {
 		this.homeURL = homeURL;
 		try {
-			if (!homepageFile.exists()) {
-				homepageFile.createNewFile();
-			}
+			//if (!homepageFile.exists()) {
+			//	homepageFile.createNewFile();
+			//}
 
 			bw = new BufferedWriter(new FileWriter(homepageFile.getAbsoluteFile(), false));
 
@@ -249,32 +286,59 @@ public class Window extends JFrame {
 		}
 
 	}
-	
+		
 	public ArrayList<String> getFavourites() {
 		favourites = new ArrayList<String>();
-
-		if (favouritesFile.exists()) {
-			try {
-				br = new BufferedReader(new FileReader(homepageFile.getAbsoluteFile()));
+		try {
+			if (favouritesFile.exists()) {
+				br = new BufferedReader(new FileReader(favouritesFile.getAbsoluteFile()));
 				String temp;
 				while ((temp = br.readLine()) != null) {
 					favourites.add(temp);
 				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
+			} else {
+				favouritesFile.createNewFile();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		//FIXME
-		
-		
 		
 		return favourites;
+	}
+	
+	public void removeFavourite(int index) {
+		String urlToDelete = favourites.get(index);
+		favourites.remove(index);
+		try {
+			tempFile = new File(TEMP_FILENAME);
+			tempFile.createNewFile();
+			br = new BufferedReader(new FileReader(favouritesFile.getAbsoluteFile()));
+			bw = new BufferedWriter(new FileWriter(tempFile.getAbsoluteFile()));
+
+			String currentLine;
+			int counter = 0;
+			while ((currentLine = br.readLine()) != null) {
+				if(!currentLine.equals(urlToDelete)) {
+					bw.write(currentLine);
+					bw.newLine();
+				}
+				counter++;
+			}
+			br.close();
+			bw.close();
+			tempFile.renameTo(favouritesFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//System.out.println("gone");
+		//System.out.println(favourites.toString());
+
 	}
 	
 	public JTextField getAddressBar() {
 		return addressBar;
 	}
 	
-	//TODO:???IO class which return reader/writer for correct file
+	//TODO:???IO/FileSystem/FileAccess class which return reader/writer for correct file
 }
