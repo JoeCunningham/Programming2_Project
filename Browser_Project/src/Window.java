@@ -14,8 +14,6 @@ public class Window extends JFrame {
 	private JTextField addressBar;
 	private JButton btnGo, btnBack, btnForward, btnHome, btnRefresh;
 	private final Dimension MINIMUM_SIZE = new Dimension(800, 600);
-	//private static int currentPageIndex;
-	//private static int originalPageIndex;
 	private String homeURL;
 	private ArrayList<String> favourites;
 	private ArrayList<String> history;
@@ -44,8 +42,6 @@ public class Window extends JFrame {
 
 		this.setTitle("browser");
 		
-		//getFavourites(); //TODO remove this, put in jmenubar class
-
 		btnBack = new JButton("<");
 		btnForward = new JButton(">");
 		btnHome = new JButton("Home");
@@ -133,10 +129,7 @@ public class Window extends JFrame {
 		}
 	}
 	
-	//TODO: validate url then call loadpage method on browser class
-	
-	
-	//TODO implement linked list
+	//TODO backwards and forwards
 	/*public void addToHistory(String url) {
 		int size = history.size();
 		boolean exists = false;
@@ -151,8 +144,8 @@ public class Window extends JFrame {
 
 	} */
 	
-	public void addFavourite(String url) { //TODO favourites window
-		boolean exists = false; //TODO remove individual favourite
+	public void addFavourite(String url) {
+		boolean exists = false;
 		for (int i = 0; i < getFavourites().size(); i++) {
 			if (getFavourites().get(i).equals(url)) {
 				exists = true;
@@ -160,7 +153,7 @@ public class Window extends JFrame {
 		}
 		if (!exists) {
 			try {
-				if (getFavourites().size() < MAX_FAVOURITES) { //TODO check if it already exists
+				if (getFavourites().size() < MAX_FAVOURITES) {
 					bw = new BufferedWriter(new FileWriter(favouritesFile.getAbsoluteFile(), true));
 					bw.write(url);
 					bw.newLine();
@@ -179,7 +172,12 @@ public class Window extends JFrame {
 	}
 	
 	public void clearFavourites() {
-		System.out.println("clear"); //TODO
+		favouritesFile.delete();
+		try {
+			favouritesFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public ArrayList<String> getHistory() {
@@ -203,7 +201,7 @@ public class Window extends JFrame {
 	public void writeHistory(String url) {
 		try {
 			Date d = new Date();
-			String data = DATE_FORMAT.format(d) + "\t" + url; //TODO: edit history window to show this from file
+			String data = DATE_FORMAT.format(d) + "\t" + url;
 
 			if (!historyFile.exists()) {
 				historyFile.createNewFile();
@@ -316,13 +314,11 @@ public class Window extends JFrame {
 			bw = new BufferedWriter(new FileWriter(tempFile.getAbsoluteFile()));
 
 			String currentLine;
-			int counter = 0;
 			while ((currentLine = br.readLine()) != null) {
 				if(!currentLine.equals(urlToDelete)) {
 					bw.write(currentLine);
 					bw.newLine();
 				}
-				counter++;
 			}
 			br.close();
 			bw.close();

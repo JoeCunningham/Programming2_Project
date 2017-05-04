@@ -19,7 +19,7 @@ public class HistoryWindow extends JFrame {
 	private Window w;
 	//Dimension minimumSize;
 	
-	
+	//TODO add labels for date, time, and url
 	public HistoryWindow(Browser browser, Window window) {
 		this.w = window;
 		this.b = browser;

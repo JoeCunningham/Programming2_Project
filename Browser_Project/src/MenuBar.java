@@ -147,8 +147,17 @@ public class MenuBar extends JMenuBar {
 	public void populateFavouritesMenu() {
 		favourites.removeAll();
 		for(int i = 0; i < w.getFavourites().size() ; i++) {
+			int index = i;
 			JMenuItem temp = new JMenuItem(w.getFavourites().get(i));
-			favourites.add(temp); //TODO: refresh this list
+			
+			temp.addActionListener(
+					new ActionListener() {
+						public void actionPerformed(ActionEvent click) {
+							b.loadURL(w.getFavourites().get(index));
+						}
+					}
+					);			
+			favourites.add(temp);
 		}
 		favourites.addSeparator();
 		addToFavourites = new JMenuItem("Add current site to favourites");
@@ -158,7 +167,7 @@ public class MenuBar extends JMenuBar {
 		favourites.add(showFavourites);
 		favourites.add(clearFavourites);
 
-		addToFavourites.addActionListener( //TODO: refresh favorites list when added
+		addToFavourites.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent click) {
 						w.addFavourite(b.getPage().toString());
